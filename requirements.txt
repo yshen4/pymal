@@ -2,6 +2,8 @@
 NumPy
 matplotlib
 SciPy
+joblib
+scikit-learn
 tqdm
 torch
 torchvision
