@@ -1,11 +1,15 @@
 def get_sum_metrics(predictions, metrics=[]):
     for i in range(3):
-        metrics.append(lambda x: x + i)
+        # issue 1: i is captured in lambda, only last i is effective
+        # metrics.append(lambda x: x + i)
+        metrics.append(lambda x, n=i: x + n)
 
     sum_metrics = 0
     for metric in metrics:
         sum_metrics += metric(predictions)
 
+    # issue 2: metrics is captured in lambda, will need to clear it
+    metrics.clear()
     return sum_metrics
 
 

@@ -2,7 +2,7 @@ from sklearn.datasets import make_blobs
 from sklearn.model_selection import train_test_split
 
 from sklearn.linear_model import Perceptron
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.metrics import accuracy_score
 
 import matplotlib.pyplot as plot
@@ -45,5 +45,41 @@ def learn_linear_data():
     
     plot.show()
 
+def learn_nonlinear_data(n = 500, c = 3, s = 7):
+    # create the data set
+    X, y = make_blobs(n_samples = n, centers = c, random_state = s)
+    y[y==2] = 0 
+
+    # split training and testing data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+
+    # define the classifier
+    # clf = SVC(kernel="linear", random_state = 0)
+    clf = SVC(kernel="rbf", random_state = 0)
+    clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+    print ('Test accuracy: %.4f' % accuracy_score(y_test, y_pred))
+
+    x_min = X[:, 0].min()
+    x_max = X[:, 0].max()
+    y_min = X[:, 1].min()
+    y_max = X[:, 1].max()
+
+    XX, YY = np.mgrid[x_min:x_max:200j, y_min:y_max:200j]
+    Z = clf.decision_function(np.c_[XX.ravel(), YY.ravel()])
+
+    fig, ax = plot.subplots()
+    for label in [0, 1]:
+        mask = (y == label)
+        ax.scatter(X[mask, 0], X[mask, 1])
+
+    Z = Z.reshape(XX.shape)
+    ax.contour(XX, YY, Z, colors = "black", 
+               linestyles = ['--', '-', '--'],
+               levels = [-.5, 0, .5])
+    plot.show()
+
 if __name__ == '__main__':
-    learn_linear_data()
+    #learn_linear_data()
+    learn_nonlinear_data()
