@@ -5,6 +5,8 @@ from sklearn.linear_model import Perceptron
 from sklearn.svm import LinearSVC, SVC
 from sklearn.metrics import accuracy_score
 
+from sklearn.datasets import load_digits
+
 import matplotlib.pyplot as plot
 import numpy as np
 
@@ -80,6 +82,31 @@ def learn_nonlinear_data(n = 500, c = 3, s = 7):
                levels = [-.5, 0, .5])
     plot.show()
 
+def learn_digits():
+    digits = load_digits()
+    X, y = digits.data, digits.target
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=0)
+
+    # define classifier
+    # 93.85%
+    #clf = Perceptron(max_iter=40, random_state=0)
+    # 93.89%
+    #clf = LinearSVC(max_iter=40, random_state=0)
+    # 97.78%
+    clf = SVC(kernel="linear", random_state = 0)
+    # doesn't work very well
+    #clf = SVC(kernel="rbf", random_state = 0)
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+
+    print ('Test accuracy: %.4f' % accuracy_score(y_test, y_pred))
+    '''
+    fig, ax = plot.subplots()
+    ax.matshow(digits.images[0])
+    plot.show()
+    '''
+
 if __name__ == '__main__':
     #learn_linear_data()
-    learn_nonlinear_data()
+    #learn_nonlinear_data()
+    learn_digits()
