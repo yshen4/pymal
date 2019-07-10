@@ -20,8 +20,10 @@ def polynomial_kernel(X, Y, c, p):
         Returns:
             kernel_matrix - (n, m) Numpy array containing the kernel matrix
     """
-    # YOUR CODE HERE
-    raise NotImplementedError
+    k = np.matmul(X, np.transpose(Y)) + c
+    for _ in range(p):
+        k *= k
+    return k
 # pragma: coderesponse end
 
 # pragma: coderesponse template

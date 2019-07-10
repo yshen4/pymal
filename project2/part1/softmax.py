@@ -73,16 +73,14 @@ def compute_cost_function(X, Y, theta, lambda_factor, temp_parameter):
     loss = 0
     n = X.shape[0]
     k = theta.shape[0]
-    d = X.shape[1]
+    # h is k x n, p for X[i] to j is h[j][i] 
+    h = compute_probabilities(X, theta, temp_parameter)
     for i in range(n):
-        s = 0
-        for l in range(k):
-            s += np.exp(np.dot(theta[l], X[i])/temp_parameter)
         for j in range(k):
             if Y[i] != j:
                 continue
 
-            loss += np.log(np.exp(np.dot(theta[l], X[i])/temp_parameter)/s)
+            loss += np.log(h[j][i])
 
     loss /= n
 
@@ -107,8 +105,24 @@ def run_gradient_descent_iteration(X, Y, theta, alpha, lambda_factor, temp_param
     Returns:
         theta - (k, d) NumPy array that is the final value of parameters theta
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    # p is k x n, X[i] to j is p[j][i] 
+    p = compute_probabilities(X, theta, temp_parameter)
+
+    n = X.shape[0]
+    k = theta.shape[0]
+    rt_theta = np.zeros(theta.shape)
+    for j in range(k):
+        # calculate delta theta[j]
+        d_thetaj = np.zeros(theta.shape[1])
+        for i in range(n):
+            d_thetaj += ((Y[i] == j) - p[j][i])*X[i]
+        d_thetaj/=n
+        d_thetaj/=temp_parameter
+
+        # calculate updated theta[j]
+        #rt_theta[j] = (1-lambda_factor)*theta[j] + d_thetaj
+        rt_theta[j] = theta[j] - alpha*(lambda_factor*theta[j] - d_thetaj)
+    return rt_theta
 #pragma: coderesponse end
 
 #pragma: coderesponse template
@@ -129,8 +143,7 @@ def update_y(train_y, test_y):
         test_y_mod3 - (n, ) NumPy array containing the new labels (a number between 0-2)
                     for each datapoint in the test set
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    return train_y % 3, test_y % 3
 #pragma: coderesponse end
 
 #pragma: coderesponse template
@@ -149,8 +162,11 @@ def compute_test_error_mod3(X, Y, theta, temp_parameter):
     Returns:
         test_error - the error rate of the classifier (scalar)
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    error_count = 0.
+    assigned_labels = get_classification(X, theta, temp_parameter)
+    assigned_labels = assigned_labels % 3
+    Y = Y % 3
+    return 1 - np.mean(assigned_labels == Y)
 #pragma: coderesponse end
 
 def softmax_regression(X, Y, temp_parameter, alpha, lambda_factor, k, num_iterations):
@@ -178,6 +194,7 @@ def softmax_regression(X, Y, temp_parameter, alpha, lambda_factor, k, num_iterat
     theta = np.zeros([k, X.shape[1]])
     cost_function_progression = []
     for i in range(num_iterations):
+        print ("Iteration" , i)
         cost_function_progression.append(compute_cost_function(X, Y, theta, lambda_factor, temp_parameter))
         theta = run_gradient_descent_iteration(X, Y, theta, alpha, lambda_factor, temp_parameter)
     return theta, cost_function_progression
