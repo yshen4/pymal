@@ -18,7 +18,7 @@ def get_dataset():
     X, y = make_classification(n_features = 2,
                                n_redundant = 0,
                                n_informative = 1,
-                               n_clusters = 1)
+                               n_clusters_per_class = 1)
 
     print("Number of examples: %d" % X.shape[0])
     print("Number of features: %d" % X.shape[1])

@@ -9,3 +9,4 @@ torch
 torchvision
 # By July 2019, tensorflow doesn't support python 3.7, install tf-nightly instead
 # pip3 install tf-nightly
+tensorflow
