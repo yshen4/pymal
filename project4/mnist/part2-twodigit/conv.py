@@ -13,32 +13,33 @@ nb_epoch = 30
 num_classes = 10
 img_rows, img_cols = 42, 28 # input image dimensions
 
-class MLP(nn.Module):
+
+
+class CNN(nn.Module):
 
     def __init__(self, input_dimension):
-        super(MLP, self).__init__()
-        self.flatten = Flatten()
+        super(CNN, self).__init__()
 
         # initialize model layers here
         self.model = nn.Sequential(
-              nn.Linear(input_dimension, 64),
+              nn.Conv2d(1, 32, (3, 3)),
               nn.ReLU(),
+              nn.MaxPool2d((2, 2)),
+              nn.Conv2d(32, 64, (3, 3)),
+              nn.ReLU(),
+              nn.MaxPool2d((2, 2)),
+              Flatten(),
+              nn.Linear(2880, 64),
+              nn.Dropout(0.5),
               nn.Linear(64, 20),
-            )        
-        # self.fc1 = nn.Linear(input_dimension, 64)
-        # self.act = nn.ReLU()
-        # self.fc2 = nn.Linear(64, 20)
+            )
 
     def forward(self, x):
-        xf = self.flatten(x)
-
         # use model layers to predict the two digits
-        out  = self.model(xf)
-        #xf = self.fc1(xf)
-        #xf = self.act(xf)
-        #xf = self.fc2(xf)
+        rt = self.model(x)
 
-        return out[:, :10], out[:, 10:] #out_first_digit, out_second_digit
+        # out_first_digit, out_second_digit
+        return rt[:, :10], rt[:, 10:]
 
 def main():
     X_train, y_train, X_test, y_test = U.get_data(path_to_data_dir, use_mini_dataset)
@@ -62,7 +63,7 @@ def main():
 
     # Load model
     input_dimension = img_rows * img_cols
-    model = MLP(input_dimension) # TODO add proper layers to MLP class above
+    model = CNN(input_dimension) # TODO add proper layers to CNN class above
 
     # Train
     train_model(train_batches, dev_batches, model)
